@@ -1,0 +1,233 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "1e8bfba2-9527-4450-92c1-645cfac10361",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import seaborn as sns"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "984ba370-b9aa-4804-80ca-cdd697715691",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "###Loding the dataset"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "1d8884dc-a50e-430e-b6b6-95029171d559",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.read_csv(\"jupyter-notebook-Copy.xlsx\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "d596ccae-057d-41ed-a0d6-e27f96b2c3ba",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "NameError",
+     "evalue": "name 'df' is not defined",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+      "Cell \u001b[1;32mIn[2], line 1\u001b[0m\n\u001b[1;32m----> 1\u001b[0m \u001b[43mdf\u001b[49m\u001b[38;5;241m.\u001b[39mhead()\n",
+      "\u001b[1;31mNameError\u001b[0m: name 'df' is not defined"
+     ]
+    }
+   ],
+   "source": [
+    "df.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "30cc7f35-8889-4388-8e3b-13cf69c41501",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['Emotion'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "32b46dda-c654-4c9d-83ef-78d277216400",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sns.countplot(x='Emotion',data=df)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a4ee83f1-c51b-41cc-b447-b2ec79ca1a44",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "### Data pre-processing"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d63c3ce4-3cdf-4e4d-adc7-8e379e143644",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import neattext.function as nfx\n",
+    "df['Clean_Text'] = df['Text'].apply(nfx.remove_userhandles)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4612e8e5-eae4-46ac-99e5-90686b1e5352",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dir(nfx)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "07d8e010-653f-4751-819e-adf05412651a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['Clean_Text'] =df['Clean_Text'].apply(nfx.remove_stopwords)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "bfe5e927-c56d-450f-85cd-3ecc1443e71a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2b6fd66e-c803-499f-9d28-ef0057dabfe0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "x = df['Clean_Text']\n",
+    "y = df['Emotion']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "df1cba63-64dc-486c-8f3d-f67515d980f6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.model_selection import train_test_split\n",
+    "x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.3,random_state=42)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "bf5a68bd-b2ce-48ba-bbcf-c9a1a3125003",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.pipeline import pipeline\n",
+    "from sklearn.feature_extraction.text import CountVectorizer\n",
+    "from sklearn.svm import SVC \n",
+    "from sklearn.ensemble import RandomForestClassifier\n",
+    "from sklearn.linear_model import logisticRegression"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "059e106f-8228-460b-b1bf-20516201e899",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pipe_lr = pipeline(steps=[('cv' ,CountVectorizer()),('lr' ,logisticRegression())])\n",
+    "pipe_lr.fit(x_train,y_train)\n",
+    "pipe_lr.score(x_text,y_test)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "98973c9e-9d70-4ae2-be2d-6d29ad2195ed",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pipe_svm = pipeline(steps=[('cv' ,CountVectorizer()),('svc' , SVC(kernel = 'rbf', c =10))])\n",
+    "pipe_svm.fit(x_train,y_train)\n",
+    "pipe_svm.score(x_test,y_test)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0f6f6ee7-4cd0-448a-839c-a83f135b9b06",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "### Saving the model"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2a178e5f-b48b-4f28-8a95-e79903672276",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import joblib\n",
+    "pipeline_file = open(\"text_emotion.pkl\",\"wb\")\n",
+    "joblib.dump(pipe_lr,pipeline_file)\n",
+    "pipeline_file.close()"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
